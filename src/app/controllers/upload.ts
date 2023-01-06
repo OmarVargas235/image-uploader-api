@@ -1,6 +1,61 @@
 import { Request, Response } from 'express';
+import { UploadedFile } from 'express-fileupload';
+import { generate } from 'shortid';
+import path from 'path';
+import fs from 'fs';
 
-export const uploadImg = (req: Request, resp: Response) => {
+export const uploadImg = (req: Request, resp: Response): void => {
 
-    console.log('llego');
+    if (req.files == null) {
+
+        resp.status(400).json({
+            status: 400,
+            messages: 'No se a seleccionado ninguna imagen',
+            data: null
+        });
+
+        return;
+    }
+
+    const file = req.files.file as UploadedFile
+    const name = file.name.split('.')[0]
+    const ext = file.name.split('.')[1]
+    const isValidExtension = !['png', 'jpg', 'jpeg', 'webp'].includes(ext)
+
+    if (isValidExtension) {
+
+        resp.status(400).json({
+            status: 400,
+            messages: 'Extensión no permitida',
+            data: ['png', 'jpg', 'jpeg', 'webp']
+        });
+
+        return;
+    }
+
+    const nameFile = `${name}-${generate()}.${ext}`;
+    const uploads = path.resolve(__dirname, '../../../public');
+
+    if (!fs.existsSync(uploads)) fs.mkdirSync('dist/public', { recursive: true });
+
+    const pathImageCurrent = `${uploads}/${nameFile}`;
+
+    file.mv(pathImageCurrent, function (err) {
+    
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (err) {
+            
+            return resp.status(500).json({
+                status: 500,
+                messages: null,
+                data: err
+            });
+        }
+
+        resp.status(200).json({
+            status: 200,
+            messages: 'Imagen cargada con exito',
+            data: null
+        });
+    });
 }

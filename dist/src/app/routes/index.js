@@ -11,20 +11,20 @@ const removeExtension = (fileName) => {
     var _a;
     return (_a = fileName.split('.').shift()) !== null && _a !== void 0 ? _a : '';
 };
-fs_1.default.readdirSync(pathRouter).filter(file => {
+fs_1.default.readdirSync(pathRouter).filter((file) => {
     const fileWithOutExt = removeExtension(file);
     const skip = ['index'].includes(fileWithOutExt);
-    if (!skip) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    if (!skip)
         router.use(`/${fileWithOutExt}`, require(`./${fileWithOutExt}`));
-    }
+    return undefined;
 });
 router.get('*', (req, resp) => {
     resp.status(404);
-    // resp.send({ error: 'Not Found' });
     resp.json({
         status: 500,
         message: 'Not found',
-        data: null,
+        data: null
     });
 });
 module.exports = router;

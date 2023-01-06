@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 import fs from 'fs';
 
 const router = Router();
@@ -9,24 +9,25 @@ const removeExtension = (fileName: string): string => {
     return fileName.split('.').shift() ?? '';
 }
 
-fs.readdirSync(pathRouter).filter(file => {
-
+fs.readdirSync(pathRouter).filter((file: string): void => {
+    
     const fileWithOutExt = removeExtension(file);
     const skip = ['index'].includes(fileWithOutExt);
 
-    if (!skip) {
-        router.use(`/${fileWithOutExt}`, require(`./${fileWithOutExt}`));
-    }
-});
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    if (!skip) router.use(`/${fileWithOutExt}`, require(`./${fileWithOutExt}`));
+
+    return undefined;
+})
 
 router.get('*', (req, resp) => {
 
     resp.status(404);
-    // resp.send({ error: 'Not Found' });
+
     resp.json({
         status: 500,
         message: 'Not found',
-        data: null,
+        data: null
     });
 });
 
