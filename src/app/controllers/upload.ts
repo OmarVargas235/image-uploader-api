@@ -6,7 +6,7 @@ import fs from 'fs';
 
 export const uploadImg = (req: Request, resp: Response): void => {
 
-    if (req.files == null) {
+    if (req.files === null || req.files === undefined) {
 
         resp.status(400).json({
             status: 400,
