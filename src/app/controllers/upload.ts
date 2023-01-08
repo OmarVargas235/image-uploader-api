@@ -1,10 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { generate } from 'shortid';
 import path from 'path';
 import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
 
-export const uploadImg = (req: Request, resp: Response): void => {
+const infoImage: { path: string; name: string } = { path: '', name: '' };
+
+export const uploadImg = async (req: Request, resp: Response, next: NextFunction): Promise<void> => {
 
     if (req.files === null || req.files === undefined) {
 
@@ -17,10 +20,10 @@ export const uploadImg = (req: Request, resp: Response): void => {
         return;
     }
 
-    const file = req.files.file as UploadedFile
-    const name = file.name.split('.')[0]
-    const ext = file.name.split('.')[1]
-    const isValidExtension = !['png', 'jpg', 'jpeg', 'webp'].includes(ext)
+    const file = req.files.file as UploadedFile;
+    const name = file.name.split('.')[0];
+    const ext = file.name.split('.')[1];
+    const isValidExtension = !['png', 'jpg', 'jpeg', 'webp'].includes(ext);
 
     if (isValidExtension) {
 
@@ -51,11 +54,39 @@ export const uploadImg = (req: Request, resp: Response): void => {
                 data: err
             });
         }
+    });
+
+    infoImage.path = pathImageCurrent;
+    infoImage.name = name;
+    next();
+}
+
+export const saveCloudinary = async (req: Request, resp: Response): Promise<void> => {
+
+    try {
+
+        const result = await cloudinary.uploader.upload(infoImage.path);
+
+        const data = {
+            url: result.url,
+            id: result.public_id,
+            nameFile: infoImage.name,
+        }
 
         resp.status(200).json({
             status: 200,
             messages: 'Imagen cargada con exito',
+            data
+        });
+
+    } catch(err) {
+
+        console.log(err);
+
+        resp.status(200).json({
+            status: 500,
+            messages: 'Ocurrio un error',
             data: null
         });
-    });
+    }
 }

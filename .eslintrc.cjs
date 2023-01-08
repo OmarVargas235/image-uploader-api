@@ -24,6 +24,7 @@ module.exports = {
     },
     rules: {
         "@typescript-eslint/consistent-type-assertions": "off",
-		"@typescript-eslint/no-explicit-any": "warn"
+		"@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/no-misused-promises": "off"
     }
 }
