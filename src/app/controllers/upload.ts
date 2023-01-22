@@ -54,11 +54,11 @@ export const uploadImg = async (req: Request, resp: Response, next: NextFunction
                 data: err
             });
         }
-    });
 
-    infoImage.path = pathImageCurrent;
-    infoImage.name = name;
-    next();
+        infoImage.path = pathImageCurrent;
+        infoImage.name = name;
+        next();
+    });
 }
 
 export const saveCloudinary = async (req: Request, resp: Response): Promise<void> => {
